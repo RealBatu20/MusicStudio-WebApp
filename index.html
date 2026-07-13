@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#202226">
+  <meta name="description" content="A responsive Minecraft Bedrock sound sequencer and .mssong exporter.">
+  <title>MS Studio</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="app">
+    <header class="titlebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">MS</div>
+        <div>
+          <strong>MS Studio</strong>
+          <span>Minecraft Bedrock Music Maker</span>
+        </div>
+      </div>
+      <nav class="menu" aria-label="Application menu">
+        <button data-menu="file">FILE</button>
+        <button data-menu="edit">EDIT</button>
+        <button data-menu="add">ADD</button>
+        <button data-menu="patterns">PATTERNS</button>
+        <button data-menu="view">VIEW</button>
+        <button data-menu="options">OPTIONS</button>
+        <button data-menu="help">HELP</button>
+      </nav>
+      <div class="window-actions" aria-hidden="true"><span>—</span><span>□</span><span>×</span></div>
+    </header>
+
+    <section class="transport">
+      <div class="transport-buttons">
+        <button id="stopBtn" class="square" title="Stop">■</button>
+        <button id="playBtn" class="round primary" title="Play">▶</button>
+        <button id="recordBtn" class="round record" title="Record armed">●</button>
+      </div>
+      <label class="tempo">TEMPO <input id="bpmInput" type="number" min="40" max="240" value="120"></label>
+      <div class="position"><span id="positionText">001:01:000</span><small>PATTERN 1</small></div>
+      <label class="switch"><input id="loopInput" type="checkbox" checked><span></span> LOOP</label>
+      <label class="switch"><input id="metronomeInput" type="checkbox"><span></span> METRONOME</label>
+      <div class="project-name"><input id="titleInput" value="Untitled Song" maxlength="48" aria-label="Song title"></div>
+      <button id="exportBtn" class="toolbar-action">EXPORT .MSSONG</button>
+    </section>
+
+    <main class="workspace">
+      <aside class="browser panel" id="browserPanel">
+        <div class="panel-title"><span>BROWSER</span><button id="syncCatalogBtn" title="Sync official Bedrock sound catalog">↻</button></div>
+        <div class="search-row">
+          <input id="soundSearch" type="search" placeholder="Search all Bedrock sound IDs">
+          <label class="file-button" title="Import sound_definitions.json">＋<input id="catalogFile" type="file" accept=".json,application/json"></label>
+        </div>
+        <div id="catalogStatus" class="catalog-status">Loading official sound catalog…</div>
+        <div id="soundList" class="sound-list" role="listbox"></div>
+      </aside>
+
+      <section class="center">
+        <div class="tabs">
+          <button class="tab active" data-tab="rack">CHANNEL RACK</button>
+          <button class="tab" data-tab="piano">PIANO ROLL</button>
+          <button class="tab" data-tab="playlist">PLAYLIST</button>
+          <button class="tab" data-tab="mixer">MIXER</button>
+        </div>
+
+        <section id="rackView" class="view active panel">
+          <div class="panel-title">
+            <span>CHANNEL RACK</span>
+            <div>
+              <button id="addChannelBtn">＋ CHANNEL</button>
+              <label>STEPS <select id="stepsSelect"><option>16</option><option>32</option><option>64</option></select></label>
+            </div>
+          </div>
+          <div class="step-numbers" id="stepNumbers"></div>
+          <div id="channelRack" class="channel-rack"></div>
+        </section>
+
+        <section id="pianoView" class="view panel">
+          <div class="panel-title"><span>PIANO ROLL</span><span id="pianoHint">Select a channel and paint notes</span></div>
+          <div class="piano-wrap">
+            <div id="pianoKeys" class="piano-keys"></div>
+            <div id="pianoGrid" class="piano-grid"></div>
+          </div>
+        </section>
+
+        <section id="playlistView" class="view panel">
+          <div class="panel-title"><span>PLAYLIST</span><button id="duplicatePatternBtn">DUPLICATE PATTERN</button></div>
+          <div id="playlistGrid" class="playlist-grid"></div>
+        </section>
+
+        <section id="mixerView" class="view panel">
+          <div class="panel-title"><span>MIXER</span><span>Per-channel volume is exported into every event</span></div>
+          <div id="mixer" class="mixer"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span id="statusText">Ready. Web preview uses a synth; Minecraft sound IDs play in-game.</span>
+      <span id="eventCount">0 events</span>
+    </footer>
+
+    <nav class="mobile-nav">
+      <button data-mobile-tab="browser">BROWSER</button>
+      <button data-mobile-tab="rack" class="active">RACK</button>
+      <button data-mobile-tab="piano">PIANO</button>
+      <button data-mobile-tab="playlist">PLAYLIST</button>
+      <button data-mobile-tab="mixer">MIXER</button>
+    </nav>
+
+    <dialog id="exportDialog">
+      <form method="dialog">
+        <h2>Export Project</h2>
+        <p>Every export includes the required tags <code>ms:is_music</code> and <code>ms:is_song</code>.</p>
+        <label>Author <input id="authorInput" value="Player" maxlength="32"></label>
+        <label>Extra tags <input id="tagsInput" value="ms:created_in_web" placeholder="comma-separated"></label>
+        <label>Length in beats <input id="lengthInput" type="number" min="1" max="256" value="4"></label>
+        <div class="dialog-actions">
+          <button value="cancel">CANCEL</button>
+          <button type="button" id="copyJsonBtn">COPY COMPACT JSON</button>
+          <button type="button" id="downloadSongBtn" class="primary">DOWNLOAD .MSSONG</button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "MS Studio - Minecraft Bedrock Music Maker",
+  "short_name": "MS Studio",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#17191c",
+  "theme_color": "#202226",
+  "description": "Responsive Minecraft Bedrock sound sequencer and .mssong exporter.",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
