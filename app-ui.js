@@ -127,9 +127,9 @@ function bindUi() {
   $("#favoritesOnlyBtn").onclick = (event) => { event.currentTarget.classList.toggle("active"); event.currentTarget.textContent = event.currentTarget.classList.contains("active") ? "★ FAV" : "☆ FAV"; renderSoundList(); };
   $("#loadAudioBtn").onclick = () => $("#audioDialog").showModal();
   $("#audioAssetsBtn").onclick = () => $("#audioDialog").showModal();
-  $("#audioFolderInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
-  $("#audioFilesInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
-  $("#archiveInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
+  $("#audioFolderInput").onchange = async (event) => { await deepScanAssets(event.target.files, $("#rememberAudioInput").checked); event.target.value = ""; };
+  $("#audioFilesInput").onchange = async (event) => { await deepScanAssets(event.target.files, $("#rememberAudioInput").checked); event.target.value = ""; };
+  $("#archiveInput").onchange = async (event) => { await deepScanAssets(event.target.files, $("#rememberAudioInput").checked); event.target.value = ""; };
   $("#clearAudioBtn").onclick = clearStoredAudio;
   const drop = $("#audioDropZone");
   ["dragenter", "dragover"].forEach((name) => drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.add("dragover"); }));
@@ -221,6 +221,8 @@ function loadAutosave() {
 
 bindUi();
 bindFsbUi();
+bindPresetUi();
+bindTranscriberUi();
 loadAutosave();
 syncUiFromState();
 renderCategories();

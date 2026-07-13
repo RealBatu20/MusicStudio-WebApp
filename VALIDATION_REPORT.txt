@@ -1,0 +1,45 @@
+MS Studio v4.0.0 validation
+============================
+
+[PASS] manifest JSON
+[PASS] script exists: sound_catalog.js
+[PASS] script exists: app-core.js
+[PASS] script exists: app-fsb.js
+[PASS] script exists: app-audio.js
+[PASS] script exists: app-views.js
+[PASS] script exists: app-engine.js
+[PASS] script exists: app-presets.js
+[PASS] script exists: app-transcriber.js
+[PASS] script exists: app-ui.js
+[PASS] style exists: app.css
+[PASS] required file app-fsb.js
+[PASS] required file vgmstream-worker.js
+[PASS] required file app-presets.js
+[PASS] required file app-transcriber.js
+[PASS] required file sound_catalog.js
+[PASS] HTML id audioFolderInput
+[PASS] HTML id audioFilesInput
+[PASS] HTML id archiveInput
+[PASS] HTML id fsbBankList
+[PASS] HTML id fsbStreamList
+[PASS] HTML id presetList
+[PASS] HTML id transcribeFileInput
+[PASS] HTML id startTranscribeBtn
+[PASS] project version 4
+[PASS] recursive archive support
+[PASS] lazy FSB indexing
+[PASS] FFmpeg fallback
+[PASS] FFT transcription
+[PASS] FSB transcription
+[PASS] preset count >= 8 — 8
+[PASS] CSS braces balanced — 399 vs 399
+[PASS] obsolete absent: app.js
+[PASS] obsolete absent: sound_catalog_fallback.js
+[PASS] obsolete absent: sound_catalog_v2.js
+
+Passed: 35 / 35
+
+Runtime notes:
+- Browser automation was blocked by the sandbox administrator, so real user-gesture file pickers and remote WebAssembly downloads could not be launched here.
+- ZIP deflate parsing was separately exercised against a nested test archive.
+- A real Mojang FSB bank was not available in the build sandbox; the decoder follows vgmstream CLI subsong semantics and reports runtime errors visibly.

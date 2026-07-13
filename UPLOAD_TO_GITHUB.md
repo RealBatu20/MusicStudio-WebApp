@@ -1,10 +1,11 @@
-# Upload to GitHub Pages
+# Upload MS Studio 4 to GitHub Pages
 
-1. Extract `MusicStudio_WebApp_v2.0.0.zip`.
-2. Open `RealBatu20/MusicStudio-WebApp` on GitHub.
-3. Upload all extracted files and folders to the repository root on the `main` branch.
-4. Allow GitHub to replace files with matching names.
-5. The old `app.js` and `sound_catalog_fallback.js` files can be deleted, but leaving them is harmless because v2 does not load them.
-6. Open the published site and press `Ctrl + Shift + R` once. On mobile, clear the site's cached data or reopen it after GitHub Pages finishes deploying.
+1. Extract `MusicStudio_WebApp_v4.0.0.zip`.
+2. Upload everything inside the extracted folder to the root of `RealBatu20/MusicStudio-WebApp`.
+3. Delete obsolete files if still present: `app.js`, `sound_catalog_fallback.js`, `sound_catalog_v2.js`.
+4. Keep `app-fsb.js`, `app-presets.js`, `app-transcriber.js`, and `vgmstream-worker.js`.
+5. Commit to `main`.
+6. Settings → Pages → Deploy from branch → `main` → `/(root)`.
+7. After deployment, press Ctrl+Shift+R once or clear the installed PWA cache.
 
-The root must contain `index.html`, `app.css`, the five `app-*.js` files, `sound_catalog_v2.js`, `service-worker.js`, `manifest.webmanifest`, and the `icons` folder.
+The FSB decoder downloads the official vgmstream WebAssembly runtime from `https://vgmstream.org/web/` when first needed. Unsupported normal audio formats download FFmpeg WebAssembly on demand.

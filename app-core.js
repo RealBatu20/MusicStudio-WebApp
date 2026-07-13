@@ -2,12 +2,12 @@ const FALLBACK_SOUNDS = window.MS_FALLBACK_SOUNDS || [];
 const OFFICIAL_CATALOG_URL = "https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/sounds/sound_definitions.json";
 const REQUIRED_TAGS = ["ms:is_music", "ms:is_song"];
 const COLORS = ["#f0a12a", "#75c96c", "#65b7d2", "#da6a99", "#b895e7", "#e1d263", "#e46c57", "#66c0a9", "#e78bb4", "#8ab6f0"];
-const AUDIO_EXTENSIONS = /\.(ogg|wav|mp3|m4a|aac|flac|opus)$/i;
+const AUDIO_EXTENSIONS = /\.(ogg|wav|mp3|m4a|aac|flac|opus|webm|mp4|mov|mkv|avi|wma|aiff?|caf|amr|3gp|mka)$/i;
 const FSB_EXTENSIONS = /\.fsb$/i;
 const ARCHIVE_EXTENSIONS = /\.(zip|mcpack|mcaddon)$/i;
-const PROJECT_KEY = "ms-studio-project-v3";
-const FAVOURITES_KEY = "ms-studio-favourites-v3";
-const DB_NAME = "ms-studio-audio-v3";
+const PROJECT_KEY = "ms-studio-project-v4";
+const FAVOURITES_KEY = "ms-studio-favourites-v4";
+const DB_NAME = "ms-studio-audio-v4";
 const DB_STORE = "files";
 
 const $ = (selector) => document.querySelector(selector);
@@ -40,7 +40,7 @@ function makeDefaultState() {
   };
   channels.forEach((channel, index) => { channel.steps = [...pattern.channelSteps[index]]; });
   return {
-    version: 3,
+    version: 4,
     title: "Untitled Song",
     bpm: 120,
     swing: 0,
@@ -132,7 +132,7 @@ function loadPattern(patternId) {
 function snapshotCore() {
   saveActivePattern();
   return copy({
-    version: 3,
+    version: 4,
     title: state.title,
     bpm: state.bpm,
     swing: state.swing,
