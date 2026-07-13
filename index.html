@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
-  <meta name="theme-color" content="#202226">
-  <meta name="description" content="A responsive Minecraft Bedrock music workstation with real local audio previews and .mssong export.">
-  <title>MS Studio</title>
+  <meta name="theme-color" content="#090d12">
+  <meta name="description" content="A modern Minecraft Bedrock music workstation with recursive FSB bank decoding, real local audio previews and .mssong export.">
+  <title>MS Studio 3</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="app.css">
@@ -15,10 +15,10 @@
     <header class="titlebar">
       <button id="mobileMenuBtn" class="icon-button mobile-only" aria-label="Open browser">☰</button>
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">MS</div>
+        <div class="brand-mark" aria-hidden="true"><span>MS</span><i></i></div>
         <div class="brand-copy">
-          <strong>MS Studio</strong>
-          <span>Minecraft Bedrock Music Workstation</span>
+          <strong>MS Studio <em>3</em></strong>
+          <span>Bedrock sound design workstation</span>
         </div>
       </div>
       <nav class="menu" aria-label="Application menu">
@@ -66,7 +66,7 @@
     <main class="workspace">
       <aside class="browser panel" id="browserPanel">
         <div class="panel-title">
-          <span>BROWSER</span>
+          <span>ASSET BROWSER</span>
           <div class="panel-actions">
             <button id="syncCatalogBtn" title="Sync official Bedrock sound definitions">↻</button>
             <button id="closeBrowserBtn" class="mobile-only" title="Close browser">×</button>
@@ -82,7 +82,7 @@
           <button id="favoritesOnlyBtn" title="Show favourites">☆ FAV</button>
         </div>
         <div id="catalogStatus" class="catalog-status">Loading official sound definitions…</div>
-        <div id="audioStatus" class="catalog-status accent-status">No Minecraft audio assets loaded</div>
+        <div id="audioStatus" class="catalog-status accent-status">No audio vault loaded</div>
         <div id="soundList" class="sound-list" role="listbox"></div>
       </aside>
 
@@ -175,7 +175,7 @@
     </main>
 
     <footer class="statusbar">
-      <span id="statusText">Ready. Load an extracted Minecraft resource-pack sounds folder for real previews.</span>
+      <span id="statusText">Ready. Deep-scan the full Bedrock Samples pack to index nested FSB banks and playable streams.</span>
       <span id="eventCount">0 events</span>
     </footer>
 
@@ -188,26 +188,79 @@
       <button data-mobile-tab="inspector">SETTINGS</button>
     </nav>
 
-    <dialog id="audioDialog">
-      <form method="dialog" class="dialog-grid">
-        <div class="dialog-title">
-          <div><h2>Minecraft Audio Assets</h2><p>Preview actual Minecraft sounds locally without uploading them to this website.</p></div>
-          <button value="cancel" class="icon-button">×</button>
+    <dialog id="audioDialog" class="asset-dialog">
+      <form method="dialog" class="asset-lab">
+        <header class="asset-lab-head">
+          <div>
+            <div class="eyebrow">LOCAL AUDIO PIPELINE</div>
+            <h2>Audio Vault</h2>
+            <p>Search every nested folder, discover Bedrock <code>.fsb</code> banks, index every subsong, and decode previews locally with vgmstream WebAssembly.</p>
+          </div>
+          <button value="cancel" class="icon-button dialog-close" aria-label="Close">×</button>
+        </header>
+
+        <section class="asset-feature-grid">
+          <article><span>01</span><strong>Deep discovery</strong><p>Recursive folder walking, drag-and-drop directories, archives, normal audio, JSON definitions, and FSB banks.</p></article>
+          <article><span>02</span><strong>Real FSB playback</strong><p>Stream names and subsongs are indexed first. WAV is decoded only when you preview a sound.</p></article>
+          <article><span>03</span><strong>Local by design</strong><p>Your Minecraft files stay inside this browser session. The app does not upload Mojang audio.</p></article>
+        </section>
+
+        <section class="audio-drop" id="audioDropZone">
+          <div class="drop-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+          <strong>Drop the root Bedrock Samples folder here</strong>
+          <span>Every folder level is searched for <b>.fsb</b>, normal audio, and <b>sound_definitions.json</b>.</span>
+        </section>
+
+        <div class="asset-action-row">
+          <button type="button" id="deepFolderBtn" class="primary command-button">SCAN ROOT FOLDER</button>
+          <label class="button-label">FOLDER FALLBACK<input id="audioFolderInput" type="file" accept="audio/*,.fsb,.ogg,.wav,.mp3,.m4a,.aac,.flac,.opus,.json" multiple webkitdirectory directory></label>
+          <label class="button-label">FILES<input id="audioFilesInput" type="file" accept="audio/*,.fsb,.ogg,.wav,.mp3,.m4a,.aac,.flac,.opus,.json" multiple></label>
+          <label class="button-label">ARCHIVE<input id="archiveInput" type="file" accept=".zip,.mcpack,.mcaddon,application/zip" multiple></label>
+          <button type="button" id="clearAudioBtn">CLEAR VAULT</button>
+          <button type="button" id="cancelScanBtn" class="danger hidden">CANCEL SCAN</button>
         </div>
-        <div class="info-card">
-          <strong>How it works</strong>
-          <p>Select the extracted Bedrock resource-pack folder that contains <code>sounds/</code>. MS Studio matches its audio files to <code>sound_definitions.json</code>. Audio remains on this device.</p>
-        </div>
-        <div class="audio-drop" id="audioDropZone">
-          <strong>Drop audio files or an extracted resource-pack folder here</strong>
-          <span>Supported: OGG, WAV, MP3, M4A</span>
-        </div>
-        <div class="dialog-actions spread">
-          <label class="button-label primary">CHOOSE FOLDER<input id="audioFolderInput" type="file" accept="audio/*,.ogg,.wav,.mp3,.m4a" multiple webkitdirectory directory></label>
-          <label class="button-label">CHOOSE FILES<input id="audioFilesInput" type="file" accept="audio/*,.ogg,.wav,.mp3,.m4a" multiple></label>
-          <button type="button" id="clearAudioBtn">CLEAR AUDIO</button>
-        </div>
-        <label class="checkbox-row"><input id="rememberAudioInput" type="checkbox"> Remember imported audio in this browser using IndexedDB. Large vanilla packs may use substantial storage.</label>
+
+        <section class="scan-console">
+          <div class="scan-console-head">
+            <div><span>DEEP SCAN</span><strong id="scanProgressText">Waiting for assets</strong></div>
+            <code id="scanCurrentFile">No file selected</code>
+          </div>
+          <div class="scan-progress"><i id="scanProgressBar"></i></div>
+          <div class="scan-stats">
+            <div><span>Files searched</span><strong id="scanFilesStat">0</strong></div>
+            <div><span>Folder depth</span><strong id="scanDepthStat">0</strong></div>
+            <div><span>Normal audio</span><strong id="scanDirectStat">0</strong></div>
+            <div><span>FSB banks</span><strong id="scanBanksStat">0</strong></div>
+            <div><span>FSB streams</span><strong id="scanStreamsStat">0</strong></div>
+            <div><span>Sound IDs matched</span><strong id="scanMatchedStat">0</strong></div>
+          </div>
+        </section>
+
+        <section class="decoder-console">
+          <div>
+            <div class="eyebrow">DECODER CORE</div>
+            <h3>vgmstream WebAssembly</h3>
+            <p>FSB is an FMOD sample-bank container, not a browser audio codec. This worker converts a selected subsong into WAV only when playback is requested.</p>
+          </div>
+          <div class="decoder-controls">
+            <label>Decoder base URL<input id="decoderBaseInput" value="https://vgmstream.org/web/" spellcheck="false"></label>
+            <button type="button" id="testDecoderBtn">TEST DECODER</button>
+            <span id="decoderStatus">Decoder loads on the first FSB scan.</span>
+          </div>
+        </section>
+
+        <section class="bank-explorer">
+          <div class="bank-column">
+            <header><div><span>FSB BANKS</span><small>Discovered anywhere in the selected tree</small></div></header>
+            <div id="fsbBankList" class="bank-list"></div>
+          </div>
+          <div class="stream-column">
+            <header><div><span>SUBSONG EXPLORER</span><small>Preview or manually map any internal stream</small></div><input id="fsbStreamSearch" type="search" placeholder="Search stream names"></header>
+            <div id="fsbStreamList" class="stream-list"></div>
+          </div>
+        </section>
+
+        <label class="checkbox-row"><input id="rememberAudioInput" type="checkbox"> Remember normal extracted audio in IndexedDB. FSB banks remain session-only to avoid duplicating very large files.</label>
         <div id="audioDialogStatus" class="dialog-status">No audio loaded.</div>
       </form>
     </dialog>
@@ -248,8 +301,9 @@
     <input id="projectImportInput" type="file" accept=".msproject,.json,application/json" hidden>
     <input id="songImportInput" type="file" accept=".mssong,.json,application/json" hidden>
   </div>
-  <script src="sound_catalog_v2.js"></script>
+  <script src="sound_catalog.js"></script>
   <script src="app-core.js"></script>
+  <script src="app-fsb.js"></script>
   <script src="app-audio.js"></script>
   <script src="app-views.js"></script>
   <script src="app-engine.js"></script>

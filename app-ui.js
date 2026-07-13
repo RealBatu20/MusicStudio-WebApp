@@ -35,11 +35,12 @@ function showMenu(anchor, items) {
   $(".floating-menu")?.remove();
   const menu = document.createElement("div");
   menu.className = "floating-menu";
-  Object.assign(menu.style, { position: "fixed", zIndex: 1000, minWidth: "180px", padding: "4px", background: "#2b2f34", border: "1px solid #090a0b", boxShadow: "0 10px 28px #000b", borderRadius: "4px" });
+  menu.setAttribute("role", "menu");
   items.forEach((item) => {
     const button = document.createElement("button");
     button.textContent = item.label;
-    Object.assign(button.style, { width: "100%", minHeight: "32px", display: "block", textAlign: "left", padding: "5px 9px", border: "0", background: "transparent" });
+    button.className = "floating-menu-item";
+    button.setAttribute("role", "menuitem");
     button.onclick = () => { menu.remove(); item.action(); };
     menu.append(button);
   });
@@ -126,13 +127,17 @@ function bindUi() {
   $("#favoritesOnlyBtn").onclick = (event) => { event.currentTarget.classList.toggle("active"); event.currentTarget.textContent = event.currentTarget.classList.contains("active") ? "★ FAV" : "☆ FAV"; renderSoundList(); };
   $("#loadAudioBtn").onclick = () => $("#audioDialog").showModal();
   $("#audioAssetsBtn").onclick = () => $("#audioDialog").showModal();
-  $("#audioFolderInput").onchange = (event) => indexAudioFiles(event.target.files, $("#rememberAudioInput").checked);
-  $("#audioFilesInput").onchange = (event) => indexAudioFiles(event.target.files, $("#rememberAudioInput").checked);
+  $("#audioFolderInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
+  $("#audioFilesInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
+  $("#archiveInput").onchange = (event) => deepScanAssets(event.target.files, $("#rememberAudioInput").checked);
   $("#clearAudioBtn").onclick = clearStoredAudio;
   const drop = $("#audioDropZone");
   ["dragenter", "dragover"].forEach((name) => drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.add("dragover"); }));
   ["dragleave", "drop"].forEach((name) => drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.remove("dragover"); }));
-  drop.ondrop = (event) => indexAudioFiles(event.dataTransfer.files, $("#rememberAudioInput").checked);
+  drop.ondrop = async (event) => {
+    const files = await collectDroppedFiles(event.dataTransfer);
+    await deepScanAssets(files, $("#rememberAudioInput").checked);
+  };
 
   $("#addChannelBtn").onclick = addChannel;
   $("#playBtn").onclick = startPlayback;
@@ -215,6 +220,7 @@ function loadAutosave() {
 }
 
 bindUi();
+bindFsbUi();
 loadAutosave();
 syncUiFromState();
 renderCategories();
@@ -222,6 +228,8 @@ renderAll();
 updateAudioStatus();
 loadStoredAudio();
 syncOfficialCatalog();
+renderFsbBanks();
+renderFsbStreams();
 setActiveView("rack");
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(() => {});

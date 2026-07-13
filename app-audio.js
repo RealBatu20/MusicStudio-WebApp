@@ -74,6 +74,11 @@ function audioCandidates(soundId) {
 }
 
 function resolveAudioFile(soundId) {
+  const mappedKey = state.manualAudioMappings?.get(soundId);
+  if (mappedKey) {
+    const mapped = state.fsbStreams?.get(mappedKey) || [...state.audioIndex.values()].find((record) => (record.cacheKey || record.path) === mappedKey);
+    if (mapped) return mapped;
+  }
   for (const candidate of audioCandidates(soundId)) {
     const record = state.audioIndex.get(candidate.key);
     if (record) return { ...record, definitionEntry: candidate.entry };
@@ -84,14 +89,15 @@ function resolveAudioFile(soundId) {
 
 async function decodeAudioRecord(record) {
   if (!record) return null;
-  const cacheKey = record.path;
+  const cacheKey = record.cacheKey || record.path;
   if (state.audioBuffers.has(cacheKey)) return state.audioBuffers.get(cacheKey);
   const promise = (async () => {
     try {
-      const buffer = await getAudioContext().decodeAudioData(await record.blob.arrayBuffer());
+      const bytes = record.kind === "fsb" ? await decodeFsbRecord(record) : await record.blob.arrayBuffer();
+      const buffer = await getAudioContext().decodeAudioData(bytes.slice ? bytes.slice(0) : bytes);
       return buffer;
     } catch (error) {
-      console.warn(`Could not decode ${record.path}`, error);
+      console.warn(`Could not decode ${record.path || record.name}`, error);
       return null;
     }
   })();
@@ -182,7 +188,7 @@ function indexAudioFiles(files, remember = false) {
     const full = normalizePath(relative);
     const soundsAt = full.indexOf("sounds/");
     const canonical = soundsAt >= 0 ? full.slice(soundsAt) : full;
-    const record = { path: canonical, blob: file, name: file.name, type: file.type || "audio/ogg" };
+    const record = { kind: "file", cacheKey: `file:${canonical}`, path: canonical, blob: file, name: file.name, type: file.type || "audio/ogg" };
     const aliases = new Set([canonical, full, canonical.replace(/^sounds\//, ""), canonical.split("/").pop()]);
     aliases.forEach((key) => state.audioIndex.set(key, record));
     dbRecords.push(record);
@@ -197,14 +203,19 @@ function indexAudioFiles(files, remember = false) {
 }
 
 function uniqueAudioRecords() {
-  return [...new Map([...state.audioIndex.values()].map((record) => [record.path, record])).values()];
+  return [...new Map([...state.audioIndex.values()].map((record) => [record.cacheKey || record.path, record])).values()];
 }
 
 function updateAudioStatus() {
-  const count = uniqueAudioRecords().length;
-  $("#audioStatus").textContent = count ? `${count.toLocaleString()} local audio files available for real previews` : "No Minecraft audio assets loaded; synthesized preview is active";
+  const records = uniqueAudioRecords();
+  const direct = records.filter((record) => record.kind !== "fsb").length;
+  const fsb = records.filter((record) => record.kind === "fsb").length;
+  const count = records.length;
+  $("#audioStatus").textContent = count
+    ? `${direct.toLocaleString()} files + ${fsb.toLocaleString()} FSB streams ready for real previews`
+    : "No Minecraft audio assets loaded; synthesized preview is active";
   $("#audioCount").textContent = count.toLocaleString();
-  $("#audioDialogStatus").textContent = count ? `${count.toLocaleString()} unique audio files indexed.` : "No audio loaded.";
+  $("#audioDialogStatus").textContent = count ? `${count.toLocaleString()} unique playable assets indexed.` : "No audio loaded.";
 }
 
 function openAudioDb() {
@@ -259,6 +270,14 @@ async function loadStoredAudio() {
 async function clearStoredAudio() {
   state.audioIndex.clear();
   state.audioBuffers.clear();
+  state.fsbBanks?.clear();
+  state.fsbStreams?.clear();
+  state.manualAudioMappings?.clear();
+  if (typeof selectedFsbBankPath !== "undefined") selectedFsbBankPath = null;
+  state.scanStats = { files: 0, depth: 0, directAudio: 0, fsbBanks: 0, fsbStreams: 0, definitions: 0, matched: 0 };
+  renderFsbBanks?.();
+  renderFsbStreams?.();
+  updateScanStatsUi?.();
   if (window.indexedDB) {
     try {
       const db = await openAudioDb();

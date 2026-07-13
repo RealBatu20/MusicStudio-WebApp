@@ -2,10 +2,12 @@ const FALLBACK_SOUNDS = window.MS_FALLBACK_SOUNDS || [];
 const OFFICIAL_CATALOG_URL = "https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/sounds/sound_definitions.json";
 const REQUIRED_TAGS = ["ms:is_music", "ms:is_song"];
 const COLORS = ["#f0a12a", "#75c96c", "#65b7d2", "#da6a99", "#b895e7", "#e1d263", "#e46c57", "#66c0a9", "#e78bb4", "#8ab6f0"];
-const AUDIO_EXTENSIONS = /\.(ogg|wav|mp3|m4a|aac|flac)$/i;
-const PROJECT_KEY = "ms-studio-project-v2";
-const FAVOURITES_KEY = "ms-studio-favourites-v2";
-const DB_NAME = "ms-studio-audio-v1";
+const AUDIO_EXTENSIONS = /\.(ogg|wav|mp3|m4a|aac|flac|opus)$/i;
+const FSB_EXTENSIONS = /\.fsb$/i;
+const ARCHIVE_EXTENSIONS = /\.(zip|mcpack|mcaddon)$/i;
+const PROJECT_KEY = "ms-studio-project-v3";
+const FAVOURITES_KEY = "ms-studio-favourites-v3";
+const DB_NAME = "ms-studio-audio-v3";
 const DB_STORE = "files";
 
 const $ = (selector) => document.querySelector(selector);
@@ -38,7 +40,7 @@ function makeDefaultState() {
   };
   channels.forEach((channel, index) => { channel.steps = [...pattern.channelSteps[index]]; });
   return {
-    version: 2,
+    version: 3,
     title: "Untitled Song",
     bpm: 120,
     swing: 0,
@@ -65,6 +67,10 @@ function makeDefaultState() {
     favourites: new Set(JSON.parse(localStorage.getItem(FAVOURITES_KEY) || "[]")),
     audioIndex: new Map(),
     audioBuffers: new Map(),
+    fsbBanks: new Map(),
+    fsbStreams: new Map(),
+    manualAudioMappings: new Map(),
+    scanStats: { files: 0, depth: 0, directAudio: 0, fsbBanks: 0, fsbStreams: 0, definitions: 0, matched: 0 },
     history: [],
     future: []
   };
@@ -126,7 +132,7 @@ function loadPattern(patternId) {
 function snapshotCore() {
   saveActivePattern();
   return copy({
-    version: 2,
+    version: 3,
     title: state.title,
     bpm: state.bpm,
     swing: state.swing,
@@ -155,6 +161,10 @@ function restoreCore(data) {
     soundDefinitions: state.soundDefinitions,
     audioIndex: state.audioIndex,
     audioBuffers: state.audioBuffers,
+    fsbBanks: state.fsbBanks,
+    fsbStreams: state.fsbStreams,
+    manualAudioMappings: state.manualAudioMappings,
+    scanStats: state.scanStats,
     favourites: state.favourites,
     history: state.history,
     future: state.future
