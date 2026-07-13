@@ -1,44 +1,65 @@
-# MS Studio Web App
+# MS Studio Web App v2
 
-A responsive, installable PWA for arranging Minecraft Bedrock sound identifiers and exporting `.mssong` projects.
+A responsive, installable Minecraft Bedrock music workstation for Windows, Android, tablets, phones and other modern browsers. It arranges Bedrock sound identifiers, previews matching local Minecraft audio assets and exports `.mssong` files for the Music Studio add-on.
 
-## Run
+## GitHub Pages
 
-The app is static. Serve the `webapp` folder from any HTTPS host:
+This repository is a static website. In GitHub, open **Settings → Pages**, select **Deploy from a branch**, choose `main` and `/(root)`, then save.
 
-- GitHub Pages
-- Cloudflare Pages
-- Netlify
-- Vercel
-- Any normal web server
+Published project URL:
 
-For a quick local test:
-
-```bash
-python -m http.server 8080 --directory webapp
+```text
+https://realbatu20.github.io/MusicStudio-WebApp/
 ```
 
-Open `http://localhost:8080`.
+After an update, use a hard refresh once so the previous PWA cache is replaced.
 
-## Full sound catalog
+## Real Minecraft audio preview
 
-On startup, the app attempts to fetch Mojang's current `sound_definitions.json` from the official `Mojang/bedrock-samples` repository. If the request is blocked or offline, it uses a smaller built-in fallback list.
+Minecraft audio files are not redistributed by this repository. To preview the actual sounds:
 
-You can always click the `+` button beside the sound search and import a current `sound_definitions.json` manually.
+1. Open **AUDIO → Load audio**.
+2. Extract a Minecraft Bedrock resource pack that contains the `sounds/` directory.
+3. Choose that extracted folder, select individual `.ogg`, `.wav`, `.mp3` or `.m4a` files, or drag the files onto the audio panel.
+4. The app matches sound IDs from `sound_definitions.json` to the selected files.
 
-## Audio preview
+You may optionally store the imported audio locally with IndexedDB. Large vanilla audio collections can consume substantial browser storage.
 
-The web app does **not** redistribute Minecraft audio files. Browser preview uses a lightweight synthesized click/tone. The selected sound identifiers play as actual Minecraft sounds after the project is imported into the add-on.
+Without a matching local file, the app uses a category-aware synthesized preview and marks the sound with a diamond icon instead of a play icon.
 
-## Import into Bedrock
+## Main workstation features
 
-Small projects:
-1. Click **EXPORT .MSSONG**.
-2. Click **COPY COMPACT JSON**.
-3. In Minecraft, use the Music Studio item.
-4. Choose **Import Compact JSON** and paste.
+- Responsive desktop, tablet and mobile workspaces
+- Channel Rack with touch painting, mute, solo, randomize and rotation
+- Multiple patterns with create, duplicate, switch and delete
+- Piano Roll with velocity, note length, zoom, dragging and resizing
+- Playlist clips with song mode, tracks and drag arrangement
+- Mixer with volume, pan, pitch, low-pass filter and delay
+- Master volume, swing, metronome, loop and tap tempo
+- Undo/redo and automatic local project recovery
+- `.msproject` save/load
+- `.mssong` import/export and compact JSON export
+- Keyboard note recording and optional Web MIDI input
+- Favourites and sound-category filtering
+- PWA install and offline application shell
 
-Large projects:
-1. Export the `.mssong`.
-2. Run `tools/import_song.py`.
-3. Import the rebuilt `.mcaddon` into Minecraft.
+## Shortcuts
+
+```text
+Space             Play or pause
+Escape            Stop
+Ctrl/Cmd + Z       Undo
+Ctrl/Cmd + Y       Redo
+Ctrl/Cmd + S       Save .msproject
+Delete             Clear selected channel
+Z S X D C V G B H N J M ,   Play/record notes
+```
+
+## Bedrock export tags
+
+Every exported song includes:
+
+```text
+ms:is_music
+ms:is_song
+```
